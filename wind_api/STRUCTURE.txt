@@ -1,0 +1,48 @@
+# wind_api/ — ASCE 7 Wind Load API
+#
+# Production repository structure:
+#
+# wind_api/
+# ├── app/
+# │   ├── __init__.py
+# │   ├── main.py              ← FastAPI application factory & lifespan
+# │   ├── config.py            ← Settings via pydantic-settings (DB URL, env vars)
+# │   │
+# │   ├── models/              ← Pydantic request/response schemas
+# │   │   ├── __init__.py
+# │   │   ├── common.py        ← Shared enums, base models
+# │   │   ├── requests.py      ← Inbound payload schemas (with validators)
+# │   │   └── responses.py     ← Outbound response schemas
+# │   │
+# │   ├── routers/             ← FastAPI route handlers (thin controllers)
+# │   │   ├── __init__.py
+# │   │   ├── velocity.py      ← POST /calculate/wind/qz
+# │   │   ├── cc.py            ← POST /calculate/wind/cc
+# │   │   ├── mwfrs.py         ← POST /calculate/wind/mwfrs/directional
+# │   │   │                       POST /calculate/wind/mwfrs/lowrise
+# │   │   └── analysis.py      ← POST /calculate/wind/full-analysis
+# │   │
+# │   ├── services/            ← Pure calculation logic (framework-agnostic)
+# │   │   ├── __init__.py
+# │   │   ├── engine.py        ← The asce7_wind_engine.py module (Step 3)
+# │   │   ├── interpolation.py ← linear_interpolate, log_linear_interpolate
+# │   │   └── lookups.py       ← DB query wrappers (fetch_bounds, fetch_terrain)
+# │   │
+# │   └── db/                  ← Database layer
+# │       ├── __init__.py
+# │       ├── session.py       ← AsyncSession factory, get_db dependency
+# │       └── repository.py    ← SQLAlchemy ORM models + typed query methods
+# │
+# ├── tests/
+# │   ├── conftest.py          ← Fixtures (test client, mock DB)
+# │   ├── test_velocity.py     ← qz endpoint tests
+# │   ├── test_cc.py           ← C&C endpoint tests
+# │   └── test_engine.py       ← Unit tests for pure calculation functions
+# │
+# ├── alembic/                 ← Database migrations
+# │   └── versions/
+# │
+# ├── alembic.ini
+# ├── pyproject.toml
+# ├── Dockerfile
+# └── docker-compose.yml       ← PostgreSQL + API
